@@ -72,8 +72,9 @@ Arguments:
 
 Example output:
 ```
-Predicted Food: Biryani
-Estimated Calories: 450 kcal
+Predicted Food: ice_cream
+Estimated Calories: 207 kcal
+Confidence: 50.02%
 ```
 
 ## Dataset
