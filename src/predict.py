@@ -1,6 +1,7 @@
 # src/predict.py
 
 import torch
+import torch.nn.functional as F
 from torchvision import transforms
 from PIL import Image
 from src.calorie_map import calorie_map
@@ -39,8 +40,9 @@ def predict_image(image_path, model, class_names, device, img_size=224):
 
     with torch.no_grad():
         outputs = model(image)
-        _, predicted = torch.max(outputs, 1)
+        probs = F.softmax(outputs, dim=1)
+        confidence, predicted = torch.max(probs, 1)
         predicted_class = class_names[predicted.item()]
         estimated_calories = calorie_map.get(predicted_class, "Unknown")
 
-    return predicted_class, estimated_calories
+    return predicted_class, estimated_calories, confidence.item()

@@ -49,10 +49,11 @@ def predict(args):
     num_classes = len(class_names)
 
     model = load_model(args.model_path, num_classes, device)
-    predicted_class, calories = predict_image(args.image_path, model, class_names, device)
+    predicted_class, calories, confidence = predict_image(args.image_path, model, class_names, device)
 
     print(f"Predicted Food: {predicted_class}")
     print(f"Estimated Calories: {calories} kcal")
+    print(f"Confidence: {confidence * 100:.2f}%")
 
 def main():
     parser = argparse.ArgumentParser(description="Bengali Food Calorie Estimator")
