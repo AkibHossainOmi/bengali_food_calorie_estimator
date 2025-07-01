@@ -1,6 +1,6 @@
 # Bengali Food Calorie Estimator
 
-![Bengali Food](https://d4t7t8y8xqo0t.cloudfront.net/app/resized/1080X/eazytrendz/3108/trend20210413160402.jpg)
+![Bengali Food](https://media-cdn2.greatbritishchefs.com/media/ribbanef/img81602.whqc_1426x713q80.jpg)
 
 A deep learning-based system that classifies Bengali food images and estimates their calorie content using a MobileNetV2 model.
 
