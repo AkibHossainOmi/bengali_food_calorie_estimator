@@ -26,39 +26,33 @@ def get_model(num_classes, pretrained=True):
 
     return model
 
-def train(model, dataloaders, criterion, optimizer, device, num_epochs=10, save_path="best_model.pth", patience=3):
-    """
-    Train the model and save the best weights based on validation accuracy.
-    Stop early if no improvement for 'patience' epochs.
+def train(model, dataloaders, criterion, optimizer, device,
+          num_epochs=10, save_path="best_model.pth", patience=3,
+          resume=False, checkpoint_path="outputs/models/checkpoint.pth"):
 
-    Args:
-        model: PyTorch model
-        dataloaders: dict with 'train' and 'val' DataLoaders
-        criterion: loss function
-        optimizer: optimizer
-        device: 'cpu' or 'cuda'
-        num_epochs: number of epochs
-        save_path: path to save best model
-        patience: number of epochs to wait for val acc improvement
-
-    Returns:
-        model: best trained model
-    """
     model.to(device)
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
     epochs_no_improve = 0
+    start_epoch = 0
 
-    for epoch in range(num_epochs):
+    # Resume training if checkpoint exists
+    if resume:
+        print(f"Resuming from checkpoint: {checkpoint_path}")
+        checkpoint = torch.load(checkpoint_path, map_location=device)
+        model.load_state_dict(checkpoint['model_state'])
+        optimizer.load_state_dict(checkpoint['optimizer_state'])
+        start_epoch = checkpoint['epoch'] + 1
+        best_acc = checkpoint.get('best_acc', 0.0)
+        epochs_no_improve = checkpoint.get('epochs_no_improve', 0)
+
+    for epoch in range(start_epoch, num_epochs):
         print(f"Epoch {epoch+1}/{num_epochs}")
         print("-" * 20)
         start_time = time.time()
 
         for phase in ['train', 'val']:
-            if phase == 'train':
-                model.train()
-            else:
-                model.eval()
+            model.train() if phase == 'train' else model.eval()
 
             running_loss = 0.0
             running_corrects = 0
@@ -97,6 +91,15 @@ def train(model, dataloaders, criterion, optimizer, device, num_epochs=10, save_
                 else:
                     epochs_no_improve += 1
                     print(f"No improvement for {epochs_no_improve} epoch(s)")
+
+        # Save checkpoint at end of epoch
+        torch.save({
+            'epoch': epoch,
+            'model_state': model.state_dict(),
+            'optimizer_state': optimizer.state_dict(),
+            'best_acc': best_acc,
+            'epochs_no_improve': epochs_no_improve
+        }, checkpoint_path)
 
         print(f"Epoch time: {(time.time() - start_time):.2f} sec\n")
 

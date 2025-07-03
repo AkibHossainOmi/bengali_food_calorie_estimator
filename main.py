@@ -1,3 +1,5 @@
+# main.py
+
 import argparse
 import torch
 from torchvision.datasets import ImageFolder
@@ -22,7 +24,6 @@ def train_model(args):
     num_classes = len(dataset.classes)
 
     model = get_model(num_classes, pretrained=True)
-
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
@@ -36,7 +37,10 @@ def train_model(args):
         optimizer,
         device,
         num_epochs=args.epochs,
-        save_path=args.model_path
+        save_path=args.model_path,
+        patience=args.patience,
+        resume=args.resume,
+        checkpoint_path=args.checkpoint_path
     )
 
     print(f"Training complete. Best model saved to {args.model_path}")
@@ -69,7 +73,10 @@ def main():
     train_parser.add_argument("--num_workers", type=int, default=4)
     train_parser.add_argument("--lr", type=float, default=1e-4)
     train_parser.add_argument("--epochs", type=int, default=10)
+    train_parser.add_argument("--patience", type=int, default=3)
     train_parser.add_argument("--model_path", type=str, default="outputs/models/bengali_food_model.pth")
+    train_parser.add_argument("--resume", action="store_true", help="Resume training from checkpoint")
+    train_parser.add_argument("--checkpoint_path", type=str, default="outputs/models/checkpoint.pth")
 
     # Predict command
     predict_parser = subparsers.add_parser("predict", help="Predict food and calories from image")
