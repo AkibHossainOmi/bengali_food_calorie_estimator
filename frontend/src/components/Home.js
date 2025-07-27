@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Home() {
   const [hoveredDish, setHoveredDish] = useState(null);
@@ -23,21 +24,22 @@ export default function Home() {
               Our AI-powered analyzer helps you enjoy traditional Bengali cuisine while maintaining nutritional awareness.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <a 
-                href="/predict" 
+              <Link 
+                to="/predict"
                 className="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-md transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 flex items-center justify-center"
               >
                 Start Predicting Now
                 <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
-              </a>
-              <a 
-                href="/about" 
+              </Link>
+
+              <Link 
+                to="/about" 
                 className="px-8 py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:border-emerald-500 hover:text-emerald-600 transition-colors duration-300"
               >
                 Learn How It Works
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -155,12 +157,12 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-6">Ready to Explore Bengali Cuisine Smartly?</h2>
           <p className="text-xl mb-8 opacity-90">Join thousands of food enthusiasts who are enjoying their favorite dishes while staying nutritionally informed.</p>
-          <a 
-            href="/register" 
+          <Link 
+            to="/register" 
             className="inline-block px-8 py-4 bg-white text-emerald-700 font-bold rounded-lg shadow-lg hover:bg-gray-100 transition-colors duration-300"
           >
             Get Started for Free
-          </a>
+          </Link>
         </div>
       </section>
     </div>
