@@ -19,6 +19,7 @@ itsdangerous
 databases
 sqlalchemy
 aiosmtplib
+python-jose[cryptography]
 
 # MySQL driver
 pymysql

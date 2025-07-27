@@ -40,7 +40,7 @@ export default function Predictor() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-gradient-to-b from-gray-50 to-white py-12 px-4 bg-gradient-to-r from-emerald-50 to-amber-50">
+    <div className="min-h-[calc(100vh-64px)] py-12 px-4 bg-gradient-to-r from-emerald-50 to-amber-50">
       <div className="max-w-3xl mx-auto">
         {/* Hero Section */}
         <div className="text-center mb-12">
