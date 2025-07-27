@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { authAPI } from '../utils/apiService';
 
@@ -7,8 +7,12 @@ export default function EmailVerification() {
   const [message, setMessage] = useState('Verifying your email...');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const calledOnce = useRef(false);
 
   useEffect(() => {
+    if (calledOnce.current) return;
+    calledOnce.current = true;
+
     const params = new URLSearchParams(location.search);
     const token = params.get('token');
 
@@ -20,15 +24,10 @@ export default function EmailVerification() {
 
     authAPI.verifyEmail(token)
       .then((res) => {
-        // Show backend message as is, but optionally map for friendly UI
-        if (res.msg === 'Account already verified') {
-          setMessage('Your email is already verified. You can log in.');
-        } else {
-          setMessage('Email verified successfully! You can now log in.');
-        }
+        setMessage(res.msg || 'Email verified successfully! You can now log in.');
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         setError(err.response?.data?.detail || err.message || 'Verification failed.');
         setLoading(false);
       });

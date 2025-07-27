@@ -1,10 +1,11 @@
+import os
 import aiosmtplib
 from email.message import EmailMessage
 
-SMTP_HOST = "smtp.gmail.com"
-SMTP_PORT = 587
-SMTP_USER = "ecosyncinfo@gmail.com "
-SMTP_PASSWORD = "vglg zlic vtmo emqo"
+SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
+SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
+SMTP_USER = os.getenv("SMTP_USER")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 
 async def send_email(to_email: str, subject: str, body: str):
     message = EmailMessage()
@@ -12,6 +13,7 @@ async def send_email(to_email: str, subject: str, body: str):
     message["To"] = to_email
     message["Subject"] = subject
     message.set_content(body)
+    message.add_alternative(body, subtype="html")
 
     await aiosmtplib.send(
         message,

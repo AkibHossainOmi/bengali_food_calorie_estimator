@@ -1,3 +1,5 @@
+import http
+import os
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
@@ -12,8 +14,11 @@ from fastapi import Depends
 from app.core.security import verify_password
 from app.core.jwt import create_access_token
 from fastapi import BackgroundTasks
+import datetime
 
 router = APIRouter()
+
+FRONTEND_SITE_URL = os.getenv("FRONTEND_SITE_URL")
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -32,13 +37,13 @@ async def register_user(user: UserCreate, background_tasks: BackgroundTasks, db:
     db.refresh(new_user)
 
     token = generate_verification_token(new_user.email)
-    verify_url = f"http://localhost:3000/verify-email?token={token}"  # Adjust frontend URL as needed
+    verify_url = f"{FRONTEND_SITE_URL}/verify-email?token={token}"  # Adjust frontend URL as needed
 
     background_tasks.add_task(
         send_email,
         to_email=new_user.email,
         subject="Please verify your email",
-        body=f"Click to verify your account: {verify_url}"
+        body=build_verification_email_body(verify_url),
     )
 
     return {"msg": "Registration successful, please check your email to verify your account"}
@@ -82,7 +87,7 @@ async def password_reset_request(data: PasswordResetRequest, background_tasks: B
     user = db.query(User).filter(User.email == data.email).first()
     if user:
         token = generate_password_reset_token(user.email)
-        reset_url = f"http://localhost:3000/reset-password?token={token}"
+        reset_url = f"{FRONTEND_SITE_URL}/reset-password?token={token}"
 
         background_tasks.add_task(
             send_email,
@@ -110,3 +115,68 @@ async def password_reset_confirm(data: PasswordResetConfirm, db: Session = Depen
     user.hashed_password = hash_password(data.new_password)
     db.commit()
     return {"msg": "Password reset successful"}
+
+def build_verification_email_body(verify_url: str) -> str:
+    return f"""
+        <html>
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="font-family: 'Arial', sans-serif; background-color: #f8fafc; margin: 0; padding: 0;">
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+            <tr>
+                <td align="center" style="padding: 40px 20px;">
+                <table width="100%" max-width="600" cellpadding="0" cellspacing="0" role="presentation" style="background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); overflow: hidden; border: 1px solid #e2e8f0;">
+                    <!-- Header -->
+                    <tr>
+                    <td style="padding: 32px 40px 24px; text-align: center; background-color: #f0fdf4; border-bottom: 1px solid #dcfce7;">
+                        <h1 style="color: #047857; margin: 0; font-size: 24px; font-weight: 600;">Verify Your Email Address</h1>
+                    </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                    <td style="padding: 32px 40px; text-align: center;">
+                        <p style="color: #334155; font-size: 16px; line-height: 1.5; margin: 0 0 24px;">
+                        Thank you for registering with <strong>Bengali Food Calorie Estimator</strong>! Please confirm your email address to complete your account setup.
+                        </p>
+                        
+                        <a href="{verify_url}" 
+                        style="
+                            display: inline-block; 
+                            padding: 12px 24px; 
+                            background-color: #059669; 
+                            color: white; 
+                            text-decoration: none; 
+                            border-radius: 8px; 
+                            font-weight: 600;
+                            font-size: 16px;
+                            transition: background-color 0.2s;
+                        "
+                        onmouseover="this.style.backgroundColor='#047857'"
+                        onmouseout="this.style.backgroundColor='#059669'"
+                        >
+                        Verify Email Address
+                        </a>
+                        
+                        <p style="color: #64748b; font-size: 14px; line-height: 1.5; margin: 32px 0 0;">
+                        If you did not create an account with us, please ignore this email.
+                        </p>
+                    </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                    <td style="padding: 24px 40px; text-align: center; background-color: #f8fafc; border-top: 1px solid #e2e8f0;">
+                        <p style="color: #94a3b8; font-size: 12px; line-height: 1.5; margin: 0;">
+                        © {datetime.datetime.now().year} Bengali Food Calorie Estimator. All rights reserved.<br>
+                        </p>
+                    </td>
+                    </tr>
+                </table>
+                </td>
+            </tr>
+            </table>
+        </body>
+        </html>
+        """
