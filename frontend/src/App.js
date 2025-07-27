@@ -10,6 +10,7 @@ import EmailVerification from "./components/EmailVerification";
 import PasswordResetRequest from "./components/PasswordResetRequest";
 import PasswordResetConfirm from "./components/PasswordResetConfirm";
 import About from "./components/About";
+import Footer from "./components/Footer";
 
 import { AuthProvider, AuthContext } from "./context/AuthContext";
 
@@ -73,6 +74,8 @@ function AppRoutes() {
         {/* Catch-all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      
+      <Footer />
     </>
   );
 }
