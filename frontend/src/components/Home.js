@@ -25,7 +25,7 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link 
-                to="/predict"
+                to="/dashboard"
                 className="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-md transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 flex items-center justify-center"
               >
                 Start Predicting Now

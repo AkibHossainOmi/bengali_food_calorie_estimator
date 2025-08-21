@@ -34,17 +34,47 @@ export const authAPI = {
 // ============ FOOD API CALLS ============
 
 export const foodAPI = {
-  predictFood: (file) => {
+  predictFood: async (file, amount = 100) => {
     if (!file) throw new Error("No file provided for prediction");
 
     const formData = new FormData();
     formData.append("file", file);
 
-    return apiService.post('/api/predict', formData, {
+    // Must match backend exactly
+    formData.append("amount_in_grams", amount);
+
+    const res = await apiService.post('/api/predict', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
-    }).then(res => res.data);
+    });
+    return res.data;
   },
 };
+
+// ============ CALORIE API CALLS ============
+
+export const calorieAPI = {
+  addCalories: async (calories, food_name) => {
+    const res = await apiService.post('/api/calorie/add', { calories, food_name });
+    return res.data;
+  },
+  getDailyProgress: async () => {
+    const res = await apiService.get('/api/calorie/progress');
+    return res.data;
+  },
+};
+
+// --------- New Profile APIs ---------
+export const profileAPI = {
+  getProfile: async () => {
+    const res = await apiService.get("/api/profile/");
+    return res;
+  },
+  updateProfile: async (payload) => {
+    const res = await apiService.put("/api/profile/update", payload);
+    return res;
+  },
+};
+
 
 // ============ GENERIC API CALL HELPER ============
 

@@ -18,7 +18,7 @@ export default function About() {
           </p>
           <div className="flex justify-center gap-4">
             <Link
-              to="/predict"
+              to="/dashboard"
               className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-lg transition-all duration-300 transform hover:-translate-y-1"
             >
               Try It Now

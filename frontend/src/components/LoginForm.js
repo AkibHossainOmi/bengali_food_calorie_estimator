@@ -11,8 +11,7 @@ export default function LoginForm({ onLogin }) {
     setError(null);
     try {
       const data = await authAPI.login({ username: email, password });
-      localStorage.setItem('access_token', data.access_token);
-      onLogin();
+      onLogin(data.access_token);
     } catch (err) {
       setError(err.response?.data?.detail || err.message);
     }

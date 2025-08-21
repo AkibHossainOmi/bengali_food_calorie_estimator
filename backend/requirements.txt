@@ -1,15 +1,36 @@
+# torch
+# torchvision
+# numpy
+# pandas
+# matplotlib
+# scikit-learn
+# opencv-python
+# tqdm
+# jupyter
+# uvicorn
+# fastapi
+# python-multipart
+
+# # New dependencies for auth & email
+# passlib[bcrypt]==1.7.4
+# bcrypt==4.0.1
+# email-validator
+# itsdangerous
+# databases
+# sqlalchemy
+# aiosmtplib
+
+# # MySQL driver
+# pymysql
+# python-dotenv
+
 torch
 torchvision
 numpy
-pandas
-matplotlib
-scikit-learn
-opencv-python
-tqdm
-jupyter
 uvicorn
 fastapi
 python-multipart
+Pillow
 
 # New dependencies for auth & email
 passlib[bcrypt]==1.7.4

@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "r
 import React, { useContext } from "react";
 
 import Navbar from "./components/Navbar";
-import Predictor from "./components/Predictor";
+import Dashboard from "./components/Dashboard";
 import Home from "./components/Home";
 import RegisterForm from "./components/RegisterForm";
 import LoginForm from "./components/LoginForm";
@@ -13,6 +13,7 @@ import About from "./components/About";
 import Footer from "./components/Footer";
 
 import { AuthProvider, AuthContext } from "./context/AuthContext";
+import Profile from "./components/Profile";
 
 // Create a separate ProtectedRoute component for better reusability
 function ProtectedRoute({ children }) {
@@ -40,10 +41,19 @@ function AppRoutes() {
 
         {/* Protected routes */}
         <Route
-          path="/predict"
+          path="/dashboard"
           element={
             <ProtectedRoute>
-              <Predictor />
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />
