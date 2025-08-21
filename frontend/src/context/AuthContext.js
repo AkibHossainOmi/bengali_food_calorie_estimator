@@ -6,6 +6,7 @@ export const AuthContext = createContext({
   user: null,
   handleLogin: () => {},
   handleLogout: () => {},
+  fetchUserProfile: async () => {},
 });
 
 export const AuthProvider = ({ children }) => {
@@ -53,7 +54,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ loggedIn, user, handleLogin, handleLogout }}>
+    <AuthContext.Provider value={{ loggedIn, user, handleLogin, handleLogout, fetchUserProfile }}>
       {children}
     </AuthContext.Provider>
   );

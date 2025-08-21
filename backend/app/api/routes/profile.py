@@ -19,21 +19,38 @@ ACTIVITY_FACTORS = {
     "extra_active": 1.9          # very hard exercise or physical job
 }
 
-def calculate_daily_calorie_goal(
-    weight: float,
-    height: float,
-    age: int,
-    gender: str,
-    activity_level: str = "sedentary"
-) -> int:
-    """Calculate daily calorie goal using BMR × activity factor."""
+def calculate_bmr(weight: float, height: float, age: int, gender: str) -> float:
+    """Calculate Basal Metabolic Rate (BMR)."""
     if gender.lower() == "male":
-        bmr = 10 * weight + 6.25 * height - 5 * age + 5
+        return 10 * weight + 6.25 * height - 5 * age + 5
     else:
-        bmr = 10 * weight + 6.25 * height - 5 * age - 161
+        return 10 * weight + 6.25 * height - 5 * age - 161
 
-    activity_factor = ACTIVITY_FACTORS.get(activity_level, 1.2)  # default sedentary
-    return int(bmr * activity_factor)
+def calculate_daily_calorie_goal(weight: float, height: float, age: int, gender: str, activity_level: str) -> int:
+    """Calculate BMR × activity factor."""
+    bmr = calculate_bmr(weight, height, age, gender)
+    factor = ACTIVITY_FACTORS.get(activity_level, 1.2)
+    return int(bmr * factor)
+
+def calculate_bmi(weight: float, height: float) -> float:
+    """Calculate BMI."""
+    h_m = height / 100
+    return weight / (h_m * h_m)
+
+def calculate_bmi_adjusted_goal(weight: float, height: float, age: int, gender: str, activity_level: str) -> int:
+    """Adjust calorie goal based on BMI."""
+    current_calories = calculate_daily_calorie_goal(weight, height, age, gender, activity_level)
+    bmi = calculate_bmi(weight, height)
+
+    # Adjust calorie goal based on BMI
+    if bmi < 18.5:
+        return int(current_calories * 1.1)  # underweight → increase
+    elif 25 <= bmi < 30:
+        return int(current_calories * 0.9)  # overweight → decrease
+    elif bmi >= 30:
+        return int(current_calories * 0.8)  # obese → decrease more
+    else:
+        return int(current_calories)  # normal → keep as is
 
 def user_to_response(user: User) -> UserResponse:
     """Convert SQLAlchemy User model to UserResponse dict."""
@@ -76,7 +93,7 @@ def update_profile(
         current_user.gender,
         current_user.activity_level
     ]):
-        current_user.daily_calorie_goal = calculate_daily_calorie_goal(
+        current_user.daily_calorie_goal = calculate_bmi_adjusted_goal(
             weight=current_user.weight,
             height=current_user.height,
             age=current_user.age,

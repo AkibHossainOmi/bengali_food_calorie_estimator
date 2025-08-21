@@ -15,14 +15,11 @@ from app.core.security import verify_password
 from app.core.jwt import create_access_token
 from fastapi import BackgroundTasks
 import datetime
+from app.schemas.user import UserCreate 
 
 router = APIRouter()
 
 FRONTEND_SITE_URL = os.getenv("FRONTEND_SITE_URL")
-
-class UserCreate(BaseModel):
-    email: EmailStr
-    password: str
 
 @router.post("/register")
 async def register_user(user: UserCreate, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
@@ -31,13 +28,24 @@ async def register_user(user: UserCreate, background_tasks: BackgroundTasks, db:
         raise HTTPException(status_code=400, detail="Email already registered")
 
     hashed_pw = hash_password(user.password)
-    new_user = User(email=user.email, hashed_password=hashed_pw, is_active=False)
+    new_user = User(
+        email=user.email,
+        hashed_password=hashed_pw,
+        is_active=False,
+        name=user.name,
+        weight=user.weight,
+        height=user.height,
+        age=user.age,
+        gender=user.gender,
+        activity_level=user.activity_level,
+        daily_calorie_goal=user.daily_calorie_goal,
+    )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
 
     token = generate_verification_token(new_user.email)
-    verify_url = f"{FRONTEND_SITE_URL}/verify-email?token={token}"  # Adjust frontend URL as needed
+    verify_url = f"{FRONTEND_SITE_URL}/verify-email?token={token}"
 
     background_tasks.add_task(
         send_email,
