@@ -181,11 +181,11 @@ export default function RegisterForm() {
                 className="w-full border border-gray-300 rounded-lg px-4 py-2"
               >
                 <option value="">Select Activity Level</option>
-                <option value="sedentary">Sedentary</option>
+                <option value="sedentary">Sedentary (little or no exercise)</option>
                 <option value="light">Light (1–3 days/week)</option>
                 <option value="moderate">Moderate (3–5 days/week)</option>
                 <option value="active">Active (6–7 days/week)</option>
-                <option value="extra">Extra Active</option>
+                <option value="extra">Extra Active (physical job / 2x training)</option>
               </select>
             </div>
           </div>

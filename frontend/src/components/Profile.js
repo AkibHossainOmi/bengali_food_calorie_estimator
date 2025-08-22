@@ -152,7 +152,7 @@ export default function Profile() {
 
   return (
     <div className="max-h-screen flex flex-col bg-gradient-to-r from-emerald-50 to-amber-50">
-      <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md mt-20 mb-20">
+      <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md mt-20 mb-40">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800">My Profile</h1>
           {!isEditing && (
