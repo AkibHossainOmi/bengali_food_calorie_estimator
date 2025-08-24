@@ -6,13 +6,14 @@ import torch
 import torch.nn as nn
 from torchvision.models import mobilenet_v2, MobileNet_V2_Weights
 
-def get_model(num_classes, pretrained=True):
+def get_model(num_classes, pretrained=True, freeze_backbone=True):
     """
     Load a pretrained MobileNetV2 model and replace classifier head.
 
     Args:
         num_classes (int): Number of output classes.
         pretrained (bool): Use pretrained weights.
+        freeze_backbone (bool): Freeze the backbone layers initially.
 
     Returns:
         model (torch.nn.Module): Modified MobileNetV2 model.
@@ -24,12 +25,34 @@ def get_model(num_classes, pretrained=True):
     in_features = model.classifier[1].in_features
     model.classifier[1] = nn.Linear(in_features, num_classes)
 
+    if freeze_backbone:
+        # Freeze all layers except the classifier
+        for name, param in model.features.named_parameters():
+            param.requires_grad = False
+
     return model
+
+def unfreeze_backbone(model, up_to_layer=None):
+    """
+    Unfreeze backbone layers progressively.
+    Args:
+        model: PyTorch model.
+        up_to_layer: int or None, unfreeze first `up_to_layer` blocks. None=all.
+    """
+    for idx, (name, param) in enumerate(model.features.named_parameters()):
+        if up_to_layer is None or idx < up_to_layer:
+            param.requires_grad = True
 
 def train(model, dataloaders, criterion, optimizer, device,
           num_epochs=10, save_path="best_model.pth", patience=3,
-          resume=False, checkpoint_path="outputs/models/checkpoint.pth"):
+          resume=False, checkpoint_path="outputs/models/checkpoint.pth",
+          progressive_unfreeze_epoch=None):
+    """
+    Train the model with optional progressive unfreezing.
 
+    Args:
+        progressive_unfreeze_epoch: int or None, epoch to unfreeze backbone.
+    """
     model.to(device)
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
@@ -50,6 +73,11 @@ def train(model, dataloaders, criterion, optimizer, device,
         print(f"Epoch {epoch+1}/{num_epochs}")
         print("-" * 20)
         start_time = time.time()
+
+        # Unfreeze backbone if progressive unfreezing is scheduled
+        if progressive_unfreeze_epoch is not None and epoch == progressive_unfreeze_epoch:
+            print(f"Progressive unfreezing backbone at epoch {epoch+1}")
+            unfreeze_backbone(model)
 
         for phase in ['train', 'val']:
             model.train() if phase == 'train' else model.eval()

@@ -14,9 +14,10 @@ def load_model(model_path, num_classes, device):
     model.eval()
     return model
 
-def predict_image(image_path, model, class_names, device, img_size=224):
+def predict_image(image_path, model, class_names, device, img_size=224, threshold=0.6):
     """
     Predict the class of a single image and estimate calories.
+    Returns "Unknown Food" if confidence is below threshold.
 
     Args:
         image_path (str): Path to image.
@@ -24,9 +25,10 @@ def predict_image(image_path, model, class_names, device, img_size=224):
         class_names (list): List of class names indexed by model output.
         device: 'cpu' or 'cuda'.
         img_size (int): Resize dimension.
+        threshold (float): Confidence threshold for unknown detection.
 
     Returns:
-        predicted_class (str), estimated_calories (int or str)
+        predicted_class (str), estimated_calories (int or str), confidence (float)
     """
     transform = transforms.Compose([
         transforms.Resize((img_size, img_size)),
@@ -42,7 +44,13 @@ def predict_image(image_path, model, class_names, device, img_size=224):
         outputs = model(image)
         probs = F.softmax(outputs, dim=1)
         confidence, predicted = torch.max(probs, 1)
-        predicted_class = class_names[predicted.item()]
-        estimated_calories = calorie_map.get(predicted_class, "Unknown")
+        confidence_val = confidence.item()
 
-    return predicted_class, estimated_calories, confidence.item()
+        if confidence_val < threshold:
+            predicted_class = "Unknown Food"
+            estimated_calories = "Unknown"
+        else:
+            predicted_class = class_names[predicted.item()]
+            estimated_calories = calorie_map.get(predicted_class, "Unknown")
+
+    return predicted_class, estimated_calories, confidence_val
